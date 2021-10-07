@@ -1,58 +1,30 @@
 
-/*
-    Code made to test basic functionalities for node mcu board.
-    Opens for bluetooth, wifi and blinks 5 times.
-    Wifi will try to send email to designated email address,
-    using specific email credentials if there is wifi.
-    Bluetooth will be active to connect from code or other
-    com source.
-*/
+// WIFI STUFF
+// https://randomnerdtutorials.com/esp32-send-email-smtp-server-arduino-ide/
+// Include library included in the repo (esp-mail-client-master.zip)
+#include <ESP_Mail_Client.h>
 
-// BLUETOOTH STUFF
-#include <BLEDevice.h>
-#include <BLEUtils.h>
-#include <BLEServer.h>
+#define WIFI_SSID "nameofwifi"
+#define WIFI_PASSWORD "wifipassword"
 
-#define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
-#define BTE_SERVER_NAME ("ESP32-BLE-Server")
+#define SMTP_HOST "smtp.gmail.com"
+#define SMTP_PORT 465
 
-BLEServer *pServer;
-BLEService *pService;
-BLECharacteristic *pCharacteristic;
+/* The sign in credentials */
+#define AUTHOR_EMAIL "author.email@email.com"
+#define AUTHOR_PASSWORD "authorpass"
 
-// LED STUFF
-#define LED 2
+/* Recipient's email*/
+#define RECIPIENT_EMAIL "recipient.email@email.com"
+
+/* The SMTP Session object used for Email sending */
+SMTPSession smtp;
+/* Callback function to get the Email sending status */
+void smtpCallback(SMTP_Status status);
+
 
 void setup() {
-  // LED STUFF
-  pinMode(LED, OUTPUT);
-
-  // BLUETOOTH STUFF
   Serial.begin(115200);
-  Serial.println("Starting BLE Server!");
-  
-  BLEDevice::init(BTE_SERVER_NAME);
-  pServer = BLEDevice::createServer();
-  pService = pServer->createService(SERVICE_UUID);
-  pCharacteristic = pService->createCharacteristic(
-                                CHARACTERISTIC_UUID,
-                                BLECharacteristic::PROPERTY_READ |
-                                BLECharacteristic::PROPERTY_WRITE
-                            );
-  
-  pCharacteristic->setValue("Hello, World!");
-  pService->start();
-  BLEAdvertising *pAdvertising = pServer->getAdvertising();
-  // BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
-  pAdvertising->addServiceUUID(SERVICE_UUID);
-  pAdvertising->setScanResponse(true);
-  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
-  pAdvertising->setMinPreferred(0x12);
-  BLEDevice::startAdvertising();
-  //pAdvertising->start();
-  Serial.println("Characteristic defined! Now you can read it in the Client!");
-
   // WIFI STUFF
   Serial.println();
   Serial.print("Connecting to AP");
@@ -124,15 +96,7 @@ void setup() {
 }
 
 void loop() {
-  // This code used to test blink
-  // Should blink 5 times then wait 2 seconds
-  for(int i=0;  i < 5;  i++){
-    delay(500);
-    digitalWrite(LED, HIGH);
-    delay(500);
-    digitalWrite(LED,LOW);
-  }
-  delay(2000);
+
 }
 
 /* Callback function to get the Email sending status */
